@@ -1,0 +1,94 @@
+server:
+  port: 2003
+
+spring:
+  application:
+    name: seata-storage-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    alibaba:
+      seata:
+        tx-service-group: fsp_tx_group
+
+
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.1.99:3306/seata_storage?useSSL=false&serverTimezone=UTC
+    username: lichy
+    password: lichy
+
+feign:
+  hystrix:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+seata:
+  enabled: true
+  tx-service-group: fsp_tx_group
+  enable-auto-data-source-proxy: false
+  use-jdk-proxy: false
+  client:
+    rm:
+      async-commit-buffer-limit: 1000
+      report-retry-count: 5
+      table-meta-check-enable: false
+      report-success-enable: false
+      lock:
+        retry-interval: 10
+        retry-times: 30
+        retry-policy-branch-rollback-on-conflict: true
+    tm:
+      commit-retry-count: 5
+      rollback-retry-count: 5
+    undo:
+      data-validation: true
+      log-serialization: jackson
+      log-table: undo_log
+    log:
+      exceptionRate: 100
+  service:
+    vgroup-mapping:
+      fsp_tx_group: default
+    grouplist:
+      default: 127.0.0.1:8091
+    enable-degrade: false
+    disable-global-transaction: false
+  transport:
+    shutdown:
+      wait: 3
+    thread-factory:
+      boss-thread-prefix: NettyBoss
+      worker-thread-prefix: NettyServerNIOWorker
+      server-executor-thread-prefix: NettyServerBizHandler
+      share-boss-worker: false
+      client-selector-thread-prefix: NettyClientSelector
+      client-selector-thread-size: 1
+      client-worker-thread-prefix: NettyClientWorkerThread
+      worker-thread-size: default
+      boss-thread-size: 1
+    type: TCP
+    server: NIO
+    heartbeat: true
+    serialization: seata
+    compressor: none
+    enable-client-batch-send-request: true
+  config:
+    type: nacos
+    nacos:
+      namespace:
+      serverAddr: localhost
+      group: DEFAULT_GROUP
+  registry:
+    type: nacos
+    nacos:
+      server-addr: localhost
+      namespace:
